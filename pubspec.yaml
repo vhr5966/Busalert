@@ -1,0 +1,48 @@
+name: busalert
+description: "BusAlert Cardiff - Crowdsourced bus delay prediction app"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Firebase
+  firebase_core: ^3.12.1
+  firebase_auth: ^5.5.1
+  cloud_firestore: ^5.6.5
+  cloud_functions: ^5.2.4
+
+  # GPS tracking
+  geolocator: ^13.0.2
+
+  # Maps (OpenStreetMap via flutter_map)
+  flutter_map: ^8.3.1
+  latlong2: ^0.10.1
+
+  # Local storage
+  shared_preferences: ^2.3.5
+
+  # Connectivity / offline detection
+  connectivity_plus: ^6.1.2
+
+  # Date formatting
+  intl: ^0.20.2
+
+  # WiFi SSID scanning (for bus line detection)
+  wifi_scan: 0.4.1+2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
