@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Required for geolocator GPS access -->
+    <!-- Location: required by geolocator for GPS tracking AND by the WiFi
+         scan APIs (WifiManager.startScan/getScanResults require
+         ACCESS_FINE_LOCATION on every Android version, including 13+).
+         Requested at runtime before tracking starts. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- Required for wifi_scan package -->
+    <!-- WiFi scanning (wifi_scan package): startScan/getScanResults need
+         ACCESS_WIFI_STATE + CHANGE_WIFI_STATE plus the location permission
+         above. NEARBY_WIFI_DEVICES is NOT required for these two APIs
+         (only for hotspot/P2P/Aware/RTT), per Android docs. -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <!-- Required for connectivity_plus -->
@@ -13,7 +19,8 @@
     <application
         android:label="BusAlert Cardiff"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
