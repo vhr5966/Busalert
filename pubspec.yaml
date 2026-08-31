@@ -14,9 +14,8 @@ dependencies:
   # State management
   flutter_riverpod: ^2.6.1
 
-  # Firebase
+  # Firebase (no auth required)
   firebase_core: ^3.12.1
-  firebase_auth: ^5.5.1
   cloud_firestore: ^5.6.5
   cloud_functions: ^5.2.4
 
@@ -39,10 +38,37 @@ dependencies:
   # WiFi SSID scanning (for bus line detection)
   wifi_scan: 0.4.1+2
 
+  # HTTP requests (for BODS API)
+  http: ^1.2.0
+
+  # XML parsing (for BODS SIRI-VM responses)
+  xml: ^6.6.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "logo.png"
+  min_sdk_android: 21
+  web:
+    generate: false
+  windows:
+    generate: false
+  macos:
+    generate: false
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - routes.txt
+    - trips.txt
+    - stops.txt
+    - stop_times.txt
+    - shapes.txt
+    - calendar_dates.txt

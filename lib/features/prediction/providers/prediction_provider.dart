@@ -35,6 +35,25 @@ class PredictionQueryState {
     this.error,
   });
 
+  /// Returns stops filtered by the selected route.
+  ///
+  /// If no route is selected, returns all stops.
+  /// If route filtering returns empty, falls back to all stops.
+  List<BusStop> get filteredStops {
+    if (selectedBusLine == null || selectedBusLine!.isEmpty) {
+      return stops;
+    }
+    
+    final filtered = stops.where((stop) => stop.servesRoute(selectedBusLine!)).toList();
+    
+    // Fall back to all stops if filtering returns empty
+    if (filtered.isEmpty) {
+      return stops;
+    }
+    
+    return filtered;
+  }
+
   PredictionQueryState copyWith({
     List<BusStop>? stops,
     BusStop? selectedStop,
@@ -62,9 +81,16 @@ class PredictionNotifier extends StateNotifier<PredictionQueryState> {
   PredictionNotifier() : super(PredictionQueryState());
 
   /// Loads the list of available bus stops.
+  ///
+  /// On failure, sets an error state so the UI never silently shows
+  /// "0 bus stops available" when the data could not be loaded.
   Future<void> loadStops() async {
-    final stops = await _stopService.getStops();
-    state = state.copyWith(stops: stops);
+    try {
+      final stops = await _stopService.getStops();
+      state = state.copyWith(stops: stops, clearError: true);
+    } catch (e) {
+      state = state.copyWith(error: parseError(e));
+    }
   }
 
   /// Sets the selected bus stop.
@@ -75,6 +101,17 @@ class PredictionNotifier extends StateNotifier<PredictionQueryState> {
   /// Sets the selected bus line.
   void selectBusLine(String line) {
     state = state.copyWith(selectedBusLine: line, clearResult: true);
+  }
+
+  /// Clears the selected bus line (e.g. when the stop changes).
+  void clearBusLine() {
+    state = PredictionQueryState(
+      stops: state.stops,
+      selectedStop: state.selectedStop,
+      selectedBusLine: null,
+      selectedTime: state.selectedTime,
+      isLoading: state.isLoading,
+    );
   }
 
   /// Sets the selected time of day.
@@ -96,20 +133,12 @@ class PredictionNotifier extends StateNotifier<PredictionQueryState> {
     state = s.copyWith(isLoading: true, clearError: true, clearResult: true);
 
     try {
-      Prediction prediction;
-      try {
-        prediction = await _predictionRepository.getPrediction(
-          stopId: s.selectedStop!.id.toString(),
-          busLine: s.selectedBusLine!,
-          timeOfDay: s.selectedTime!,
-        );
-      } catch (_) {
-        prediction = await _predictionRepository.getMockPrediction(
-          stopId: s.selectedStop!.id.toString(),
-          busLine: s.selectedBusLine!,
-          timeOfDay: s.selectedTime!,
-        );
-      }
+      final prediction = await _predictionRepository.getPrediction(
+        stopId: s.selectedStop!.id.toString(),
+        busLine: s.selectedBusLine!,
+        timeOfDay: s.selectedTime!,
+        stopName: s.selectedStop!.name,
+      );
 
       state = state.copyWith(
         result: prediction,
@@ -132,12 +161,3 @@ final predictionProvider =
     StateNotifierProvider<PredictionNotifier, PredictionQueryState>(
   (ref) => PredictionNotifier(),
 );
-
-/// Common Cardiff bus lines for quick selection.
-const List<String> kCommonBusLines = [
-  '1', '2', '8', '9', '17', '18', '21', '23',
-  '24', '25', '27', '28', '29', '30', '32',
-  '44', '45', '51', '52', '53', '56', '57',
-  '58', '59', '60', '61', '62', '63', '64',
-  '65', '66', '92', '93', '94', '95', '96',
-];

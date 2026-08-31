@@ -2,12 +2,14 @@
 ///
 /// This provider orchestrates the GPS tracking lifecycle: starting/stopping
 /// the GPS listener, detecting boarding and alighting events, and recording
-/// completed journeys. Uses Firebase Auth to identify the current user.
+/// completed journeys. Uses a stable device-based user ID.
 library;
 
-import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/device_id.dart';
+import '../../../core/settings_service.dart';
 import '../../../data/models/bus_stop.dart';
 import '../../../data/models/journey.dart';
 import '../../../data/repositories/journey_repository.dart';
@@ -16,9 +18,9 @@ import '../services/boarding_detector.dart';
 import '../services/gps_tracker.dart';
 
 /// Singleton instances
-final FirebaseAuth _auth = FirebaseAuth.instance;
 final JourneyRepository _journeyRepository = JourneyRepository();
 final StopService _stopService = StopService();
+final SettingsService _settingsService = SettingsService();
 
 /// Represents the state of the live tracking system.
 sealed class TrackingState {
@@ -75,20 +77,79 @@ class TrackingNotifier extends StateNotifier<TrackingState> {
   TrackingNotifier() : super(const TrackingIdle());
 
   /// Initialises the tracking system by loading bus stops.
+  ///
+  /// If the stop data cannot be loaded, tracking is disabled with a
+  /// [TrackingError] rather than failing silently.
   Future<void> init() async {
-    _stops = await _stopService.getStops();
+    try {
+      _stops = await _stopService.getStops();
+    } catch (e) {
+      debugPrint('❌ Failed to load bus stops for tracking: $e');
+      state = TrackingError(
+        'Could not load bus stop data. Please check your connection and try again.',
+      );
+    }
   }
 
   /// Starts GPS tracking and boarding detection.
+  ///
+  /// Any failure (permission denied, GPS disabled, no activity) is
+  /// surfaced as a [TrackingError] so the user always sees why tracking
+  /// could not start — never an unhandled exception.
   Future<void> startTracking() async {
     state = const TrackingIdle();
+
+    // If stops failed to load earlier, retry once so boarding detection
+    // isn't silently disabled. init() sets TrackingError on failure.
+    if (_stops.isEmpty) {
+      await init();
+      if (_stops.isEmpty) return;
+    }
 
     _gpsTracker = GpsTracker(
       onPositionChanged: _onPositionChanged,
     );
     _detector = BoardingDetector(stops: _stops);
 
-    await _gpsTracker!.start();
+    try {
+      await _gpsTracker!.start();
+    } catch (e) {
+      debugPrint('❌ GPS start failed: $e');
+      // Stop the tracker so a failed start can't leave the GPS active.
+      await _gpsTracker?.stop();
+      _gpsTracker = null;
+      _detector = null;
+      // GpsTracker throws user-friendly messages ("Location permission is
+      // required...", "Location services are disabled..."), so surface the
+      // message directly without the "Exception: " prefix.
+      state = TrackingError(_cleanError(e));
+    }
+  }
+
+  /// Strips the "Exception: " prefix so the user sees the raw message
+  /// that [GpsTracker] throws (those messages are already user-friendly).
+  String _cleanError(Object error) {
+    final text = error.toString();
+    const prefix = 'Exception: ';
+    return text.startsWith(prefix) ? text.substring(prefix.length) : text;
+  }
+
+  /// Resolves the bus line for a boarding event.
+  ///
+  /// When WiFi detection is enabled, prefers a fresh WiFi scan result and
+  /// falls back to the detector's cached line. When it is disabled, always
+  /// returns an empty string (and clears any cached WiFi line) so the user
+  /// is prompted to confirm the route manually — a stale WiFi-detected line
+  /// must never leak through when the feature is turned off.
+  Future<String> _resolveBusLine({String? cachedLine}) async {
+    if (!await _settingsService.isWifiDetectionEnabled()) {
+      _detector?.clearWifiCache();
+      debugPrint('⚙️ WiFi bus-line detection disabled — skipping scan');
+      return '';
+    }
+
+    final wifiLine = await _detector?.detectBusLineViaWiFi() ?? '';
+    return wifiLine.isNotEmpty ? wifiLine : (cachedLine ?? '');
   }
 
   /// Stops GPS tracking and resets the state.
@@ -114,10 +175,10 @@ class TrackingNotifier extends StateNotifier<TrackingState> {
       );
 
       if (boardingResult != null) {
-        // Try to detect bus line via WiFi before emitting the boarding state.
-        // This is async so we kick it off and update state when done.
-        _detector?.detectBusLineViaWiFi().then((wifiLine) {
-          final line = wifiLine.isNotEmpty ? wifiLine : boardingResult.detectedBusLine;
+        // Determine the bus line (via WiFi if enabled in settings) before
+        // emitting the boarding state. This is async so we kick it off and
+        // update state when done.
+        _resolveBusLine(cachedLine: boardingResult.detectedBusLine).then((line) {
           state = TrackingOnBus(
             boardStop: boardingResult.stop,
             busLine: line,
@@ -153,7 +214,7 @@ class TrackingNotifier extends StateNotifier<TrackingState> {
     }
   }
 
-  /// Records a completed journey and submits to Firestore.
+  /// Records a completed journey and submits.
   Future<void> _completeJourney({
     required BusStop boardStop,
     required String busLine,
@@ -164,30 +225,37 @@ class TrackingNotifier extends StateNotifier<TrackingState> {
     required double alightLat,
     required double alightLng,
   }) async {
-    final firebaseUser = _auth.currentUser;
-    if (firebaseUser == null) {
-      state = const TrackingError('User not authenticated');
-      return;
+    try {
+      // Use device-based user ID (works with or without Firebase)
+      final userId = await DeviceIdService.getDeviceUserId();
+
+      final journey = Journey(
+        userId: userId,
+        boardStopId: boardStop.id,
+        boardStopName: boardStop.name,
+        boardLat: boardLat,
+        boardLng: boardLng,
+        alightStopId: alightStop.id,
+        alightStopName: alightStop.name,
+        alightLat: alightLat,
+        alightLng: alightLng,
+        busLine: busLine,
+        boardingTime: boardingTime,
+        alightingTime: DateTime.now(),
+      );
+
+      state = TrackingJourneyComplete(journey);
+      
+      // Submit journey (works with or without Firebase)
+      await _journeyRepository.submitJourney(journey);
+      
+      debugPrint('✅ Journey completed and saved');
+      state = const TrackingIdle();
+    } catch (e) {
+      debugPrint('❌ Error completing journey: $e');
+      // Don't crash - just log the error and continue
+      state = const TrackingIdle();
     }
-
-    final journey = Journey(
-      userId: firebaseUser.uid.hashCode,
-      boardStopId: boardStop.id,
-      boardStopName: boardStop.name,
-      boardLat: boardLat,
-      boardLng: boardLng,
-      alightStopId: alightStop.id,
-      alightStopName: alightStop.name,
-      alightLat: alightLat,
-      alightLng: alightLng,
-      busLine: busLine,
-      boardingTime: boardingTime,
-      alightingTime: DateTime.now(),
-    );
-
-    state = TrackingJourneyComplete(journey);
-    await _journeyRepository.submitJourney(journey);
-    state = const TrackingIdle();
   }
 
   /// Manually records a journey (fallback when auto-detection fails).
@@ -204,28 +272,30 @@ class TrackingNotifier extends StateNotifier<TrackingState> {
     double? alightLng,
     DateTime? alightingTime,
   }) async {
-    final firebaseUser = _auth.currentUser;
-    if (firebaseUser == null) {
-      state = const TrackingError('User not authenticated');
-      return;
+    try {
+      // Use device-based user ID (works with or without Firebase)
+      final userId = await DeviceIdService.getDeviceUserId();
+
+      final journey = Journey(
+        userId: userId,
+        boardStopId: boardStopId,
+        boardStopName: boardStopName,
+        boardLat: boardLat,
+        boardLng: boardLng,
+        alightStopId: alightStopId,
+        alightStopName: alightStopName,
+        alightLat: alightLat,
+        alightLng: alightLng,
+        busLine: busLine,
+        boardingTime: boardingTime,
+        alightingTime: alightingTime,
+      );
+
+      await _journeyRepository.submitJourney(journey);
+      debugPrint('✅ Manual journey saved');
+    } catch (e) {
+      debugPrint('❌ Error saving manual journey: $e');
     }
-
-    final journey = Journey(
-      userId: firebaseUser.uid.hashCode,
-      boardStopId: boardStopId,
-      boardStopName: boardStopName,
-      boardLat: boardLat,
-      boardLng: boardLng,
-      alightStopId: alightStopId,
-      alightStopName: alightStopName,
-      alightLat: alightLat,
-      alightLng: alightLng,
-      busLine: busLine,
-      boardingTime: boardingTime,
-      alightingTime: alightingTime,
-    );
-
-    await _journeyRepository.submitJourney(journey);
   }
 
   @override

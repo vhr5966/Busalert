@@ -1,28 +1,60 @@
-/// Repository for delay prediction operations using Firebase Functions.
-///
-/// Calls the `getPrediction` Cloud Function which computes a weighted
-/// moving average of historical journey records in Firestore.
-///
-/// Falls back to mock data if the Cloud Function is unavailable
-/// (e.g. during development without Firebase emulators running).
-library;
-
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../core/api_config.dart';
 import '../../core/constants.dart';
 import '../models/prediction.dart';
 
 class PredictionRepository {
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
-  /// Fetches a delay prediction by calling the Firebase Cloud Function.
+  /// Fetches a delay prediction by calling the backend API or Cloud Function.
   ///
   /// [timeOfDay] should be in "HH:mm" format.
   Future<Prediction> getPrediction({
     required String stopId,
     required String busLine,
     required String timeOfDay,
+    String? stopName,
   }) async {
+    // 1. Try Node.js Express backend
+    try {
+      final queryParams = <String, String>{
+        'stop': stopId,
+        'line': busLine,
+        'time': timeOfDay,
+      };
+      if (stopName != null && stopName.isNotEmpty) {
+        queryParams['stop_name'] = stopName;
+      }
+
+      final uri = Uri.parse('${ApiConfig.backendBaseUrl}/api/predictions').replace(
+        queryParameters: queryParams,
+      );
+
+      final response = await http.get(
+        uri,
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 4));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        if (stopName != null && stopName.isNotEmpty) {
+          data['stop_name'] = stopName;
+        } else {
+          data['stop_name'] ??= 'Stop #$stopId';
+        }
+        data['bus_line'] ??= busLine;
+        data['time_of_day'] ??= timeOfDay;
+        return Prediction.fromJson(data);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Node.js backend prediction query error: $e');
+    }
+
+    // 2. Try Firebase Cloud Functions fallback
     try {
       final HttpsCallable callable = _functions.httpsCallable(
         kPredictionFunctionName,
@@ -33,41 +65,23 @@ class PredictionRepository {
         'timeOfDay': timeOfDay,
       });
 
-      return Prediction.fromJson(result.data as Map<String, dynamic>);
+      final data = Map<String, dynamic>.from(result.data as Map);
+      data['stop_name'] ??= stopName ?? 'Stop #$stopId';
+      data['bus_line'] ??= busLine;
+      data['time_of_day'] ??= timeOfDay;
+      return Prediction.fromJson(data);
     } catch (e) {
-      // If the Cloud Function fails (e.g. not deployed yet), fall back
-      // to mock data so the UI can still be demonstrated.
-      return getMockPrediction(
-        stopId: stopId,
-        busLine: busLine,
-        timeOfDay: timeOfDay,
-      );
+      debugPrint('⚠️ Firebase cloud function fallback error: $e');
     }
-  }
 
-  /// Returns a mock prediction for testing when the Cloud Function
-  /// is unavailable (e.g. during development).
-  Future<Prediction> getMockPrediction({
-    required String stopId,
-    required String busLine,
-    required String timeOfDay,
-  }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final delay = switch (busLine) {
-      '1' || '2' => 5.0,
-      '8' || '9' => 12.0,
-      '28' || '29' => 3.0,
-      _ => 7.5,
-    };
-
+    // 3. If no data exists or backend is unreachable, return truthful 0 sample size prediction
     return Prediction(
-      predictedDelayMinutes: delay,
-      scheduledDurationMinutes: 25.0,
-      averageActualDurationMinutes: 25.0 + delay,
-      confidenceLevel: delay > 10 ? 'Low' : 'Medium',
-      sampleSize: delay > 10 ? 4 : 28,
-      stopName: 'Stop #$stopId',
+      predictedDelayMinutes: 0.0,
+      scheduledDurationMinutes: 0.0,
+      averageActualDurationMinutes: 0.0,
+      confidenceLevel: 'None',
+      sampleSize: 0,
+      stopName: stopName ?? 'Stop #$stopId',
       busLine: busLine,
       timeOfDay: timeOfDay,
     );

@@ -93,16 +93,21 @@ class GpsTracker {
   Future<void> start() async {
     if (_isRunning) return;
 
+    // ── Location Services Check ─────────────────────────────────────
+    // If GPS is switched off in the OS (Quick Settings / Settings), the
+    // position stream would silently never emit. Fail fast with a clear
+    // message instead of leaving the user on "Searching for Bus...".
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      throw Exception(
+        'Location services are disabled. Please turn on GPS in your '
+        'device settings to detect bus journeys.',
+      );
+    }
+
     // ── Permission Check ────────────────────────────────────────────
     // Android requires location permissions at runtime (since Android 6.0).
-    // We request "while-in-use" location since background tracking is
-    // only needed while the app is actively monitoring for journeys.
-    //
-    // NOTE: For production, you'd want a proper permission rationale
-    // dialog explaining:
-    //   "BusAlert uses GPS to detect when you board and alight buses.
-    //    This data is only used to compute delay predictions and is
-    //    never shared with third parties."
+    // We request "while-in-use" location since tracking only happens while
+    // the app is actively monitoring for journeys.
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -121,9 +126,13 @@ class GpsTracker {
     }
 
     // ── GPS Settings ────────────────────────────────────────────────
-    final LocationSettings locationSettings = LocationSettings(
+    // AndroidSettings lets us honour kGpsPollIntervalSeconds as the
+    // desired sampling interval (base LocationSettings has no interval).
+    // On iOS this falls back to the platform defaults, which is fine.
+    final LocationSettings locationSettings = AndroidSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: kSignificantMovementMeters.toInt(),
+      intervalDuration: const Duration(seconds: kGpsPollIntervalSeconds),
       timeLimit: null,
     );
 

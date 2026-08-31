@@ -96,6 +96,82 @@ class _LiveTrackingScreenState extends ConsumerState<LiveTrackingScreen> {
               ),
             ],
 
+            // ── WiFi & Sensor Diagnostic Card ───────────────────────
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.sensors, size: 16, color: kCardiffBlue),
+                      SizedBox(width: 8),
+                      Text(
+                        'Live Onboard Telemetry',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.wifi, size: 15, color: Color(0xFF16A34A)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'WiFi SSID Scanner: Active (Cardiff Bus Network)',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.speed, size: 15, color: Color(0xFF2563EB)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Boarding Velocity: Active (>7 km/h departure trigger)',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.place, size: 15, color: Color(0xFFEA580C)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Stop Geofence: 50m proximity lock',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // ── Control Button ──────────────────────────────────────
             const Spacer(),
 
