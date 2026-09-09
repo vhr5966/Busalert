@@ -1,4 +1,5 @@
 /// Home dashboard — the main screen.
+/// Home dashboard — the main screen.
 ///
 /// Provides quick-access cards to each major feature and serves as the
 /// shell for bottom navigation.
@@ -27,6 +28,26 @@ class HomeDashboard extends ConsumerStatefulWidget {
 class _HomeDashboardState extends ConsumerState<HomeDashboard> {
   int _currentIndex = 0;
 
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return HomeExploreScreen(
+          key: const ValueKey('home_explore_tab'),
+          onNavigateTab: (tab) => setState(() => _currentIndex = tab),
+        );
+      case 1:
+        return const PredictionScreen(key: ValueKey('prediction_tab'));
+      case 2:
+        return const UnifiedTransitMapScreen(key: ValueKey('unified_map_tab'));
+      case 3:
+        return const ProfileHistoryScreen(key: ValueKey('profile_tab'));
+      default:
+        return HomeExploreScreen(
+          key: const ValueKey('home_explore_tab'),
+          onNavigateTab: (tab) => setState(() => _currentIndex = tab),
+        );
+    }
+  }
   Widget _buildPage(int index) {
     switch (index) {
       case 0:

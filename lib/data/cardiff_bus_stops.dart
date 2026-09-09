@@ -1,4 +1,4 @@
-﻿/// Complete Cardiff and Regional Bus stops from NaPTAN & GTFS databases.
+/// Complete Cardiff and Regional Bus stops from NaPTAN & GTFS databases.
 /// Includes Cardiff (571), Vale of Glamorgan (572), and Newport (531).
 /// Total stops: 3764.
 library;

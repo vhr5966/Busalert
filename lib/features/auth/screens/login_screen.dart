@@ -8,6 +8,7 @@ import '../../../core/logger/app_logger.dart';
 import '../../../core/theme.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -81,6 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final bool isBusy = _isSubmitting || authState.isLoading;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F8FC),
       backgroundColor: const Color(0xFFF6F8FC),
       body: SafeArea(
         child: Center(
@@ -196,6 +198,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12)),
                       ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
                       filled: true,
                       fillColor: Colors.white,
                     ),
