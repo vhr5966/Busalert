@@ -1,14 +1,11 @@
 /// Splash screen shown on app startup.
 ///
-/// While the splash displays the app branding, it attempts to restore the
-/// user's previous Firebase Auth session. If a valid session exists,
-/// the user goes to the home dashboard; otherwise they see the login screen.
-///
-/// This provides a seamless experience — returning users don't need to
-/// log in every time.
+/// Displays the app branding while loading, then navigates directly
+/// to the home dashboard. No authentication required.
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme.dart';
@@ -25,29 +22,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Defer auth check to the next microtask so Riverpod state changes
-    // don't happen during the widget tree building phase (which would
-    // throw an assertion error). This is a common pattern when calling
-    // state-modifying async functions from initState.
-    Future.microtask(_checkAuth);
+    _navigateNext();
   }
 
-  Future<void> _checkAuth() async {
-    try {
-      await ref.read(authProvider.notifier).tryAutoLogin();
-    } catch (_) {
-      // Auth check failed — e.g. FlutterSecureStorage platform channel not
-      // available (this happens in test environments). State remains
-      // AuthInitial, and the navigation below correctly routes to /login.
-    }
-
-    // Navigate based on auth state after a short delay for branding display
+  Future<void> _navigateNext() async {
+    // Display branding for a short delay
     await Future.delayed(const Duration(milliseconds: 1500));
 
     if (!mounted) return;
 
     final authState = ref.read(authProvider);
-    if (authState is AuthAuthenticated) {
+    if (authState.hasAccess) {
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
       Navigator.of(context).pushReplacementNamed('/login');

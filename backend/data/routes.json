@@ -1,0 +1,514 @@
+﻿[
+    {
+        "id":  "CB:1",
+        "name":  "Route 1 – City Centre",
+        "number":  "1",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:1A",
+        "name":  "Route 1A – Cardiff Bus Service",
+        "number":  "1A",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:2",
+        "name":  "Route 2 – City Centre",
+        "number":  "2",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:2A",
+        "name":  "Route 2A – Cardiff Bus Service",
+        "number":  "2A",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:3",
+        "name":  "Route 3 – Wentloog Bus. Pk.",
+        "number":  "3",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:4",
+        "name":  "Route 4 – Leckwith",
+        "number":  "4",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:6",
+        "name":  "Route 6 – City Centre",
+        "number":  "6",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:7",
+        "name":  "Route 7 – Penarth",
+        "number":  "7",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:8",
+        "name":  "Route 8 – Cardiff Bay",
+        "number":  "8",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:9",
+        "name":  "Route 9 – Sports Village",
+        "number":  "9",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:11",
+        "name":  "Route 11 – Pengam Green",
+        "number":  "11",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:13",
+        "name":  "Route 13 – Drope",
+        "number":  "13",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:14",
+        "name":  "Route 14 – Heath Hospital",
+        "number":  "14",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:17",
+        "name":  "Route 17 – City Centre",
+        "number":  "17",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:18",
+        "name":  "Route 18 – City Centre",
+        "number":  "18",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:21",
+        "name":  "Route 21 – City Centre",
+        "number":  "21",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:23",
+        "name":  "Route 23 – City Centre",
+        "number":  "23",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:24",
+        "name":  "Route 24 – City Centre",
+        "number":  "24",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:25",
+        "name":  "Route 25 – City Centre",
+        "number":  "25",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:25A",
+        "name":  "Route 25A – Whitchurch",
+        "number":  "25A",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:27",
+        "name":  "Route 27 – City Centre",
+        "number":  "27",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:28",
+        "name":  "Route 28 – City Centre",
+        "number":  "28",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:29",
+        "name":  "Route 29 – City Centre",
+        "number":  "29",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:30",
+        "name":  "Cardiff Central – Newport via Royal Gwent Hospital",
+        "number":  "30",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "NB:30",
+        "name":  "Cardiff Central – Newport via Royal Gwent Hospital",
+        "number":  "30",
+        "operatorId":  "NB",
+        "isActive":  true,
+        "operatorName":  "Newport Bus"
+    },
+    {
+        "id":  "CB:32",
+        "name":  "Route 32 – St. Fagans",
+        "number":  "32",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:35",
+        "name":  "Route 35 – Gabalfa",
+        "number":  "35",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:44",
+        "name":  "Route 44 – St. Mellons",
+        "number":  "44",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:45",
+        "name":  "Route 45 – St. Mellons",
+        "number":  "45",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:49",
+        "name":  "Route 49 – City Centre",
+        "number":  "49",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:50",
+        "name":  "Route 50 – City Centre",
+        "number":  "50",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:52",
+        "name":  "Route 52 – Cyncoed",
+        "number":  "52",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:54",
+        "name":  "Route 54 – Heath Hospital",
+        "number":  "54",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:57",
+        "name":  "Route 57 – Pontprennau",
+        "number":  "57",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:58",
+        "name":  "Route 58 – Pontprennau",
+        "number":  "58",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:61",
+        "name":  "Route 61 – Pentrebane",
+        "number":  "61",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:62",
+        "name":  "Route 62 – Rhydlafar",
+        "number":  "62",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:63",
+        "name":  "Route 63 – Danescourt",
+        "number":  "63",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:64",
+        "name":  "Route 64 – Morganstown",
+        "number":  "64",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:86",
+        "name":  "Route 86 – Thornhill",
+        "number":  "86",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:91",
+        "name":  "Route 91 – Penarth Pier",
+        "number":  "91",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:92",
+        "name":  "Route 92 – Penarth",
+        "number":  "92",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:92B",
+        "name":  "Route 92B – Penarth",
+        "number":  "92B",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:93",
+        "name":  "Route 93 – Barry Morrisons",
+        "number":  "93",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:93S",
+        "name":  "Route 93S – School Bus",
+        "number":  "93S",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:94",
+        "name":  "Route 94 – Barry Morrisons",
+        "number":  "94",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:95",
+        "name":  "Route 95 – Cardiff City Stadium",
+        "number":  "95",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:96",
+        "name":  "Route 96 – Barry",
+        "number":  "96",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:101",
+        "name":  "Route 101 – Colchester Avenue",
+        "number":  "101",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:102",
+        "name":  "Route 102 – Colchester Avenue",
+        "number":  "102",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:136",
+        "name":  "Route 136 – Pentyrch",
+        "number":  "136",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:305",
+        "name":  "Route 305 – Dinas Powys",
+        "number":  "305",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:604",
+        "name":  "Route 604 – Ysgol Plasmawr",
+        "number":  "604",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:606",
+        "name":  "Route 606 – Ysgol Plasmawr",
+        "number":  "606",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:608",
+        "name":  "Route 608 – School Bus",
+        "number":  "608",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:609",
+        "name":  "Route 609 – School Bus",
+        "number":  "609",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:610",
+        "name":  "Route 610 – School Bus",
+        "number":  "610",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:611",
+        "name":  "Route 611 – School Bus",
+        "number":  "611",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:619",
+        "name":  "Route 619 – City Centre",
+        "number":  "619",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:B1",
+        "name":  "Route B1 – Barry Morrisons",
+        "number":  "B1",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:B2",
+        "name":  "Route B2 – Barry Morrisons",
+        "number":  "B2",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:H59",
+        "name":  "Route H59 – Heath Hospital",
+        "number":  "H59",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:M1",
+        "name":  "Route M1 – CMet Llandaff",
+        "number":  "M1",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    },
+    {
+        "id":  "CB:Sky",
+        "name":  "Route Sky – Techniquest",
+        "number":  "Sky",
+        "operatorId":  "CB",
+        "isActive":  true,
+        "operatorName":  "Cardiff Bus"
+    }
+]

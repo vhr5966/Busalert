@@ -37,6 +37,7 @@
 ///   detected, the user is prompted to confirm the bus line manually.
 library;
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:wifi_scan/wifi_scan.dart';
 
 import '../../../core/constants.dart';
@@ -179,7 +180,9 @@ class BoardingDetector {
   ///
   /// Attempts to scan for WiFi networks and match against known Cardiff Bus
   /// patterns. Returns the detected bus line number, or empty string if:
-  /// - WiFi scanning fails (permission denied, not supported on device)
+  /// - WiFi scanning is not supported on the device (note: this package is a
+  ///   stub on iOS, so detection only works on Android)
+  /// - Location permission is denied (required for WiFi scan results)
   /// - No Cardiff Bus SSID is detected
   /// - SSID doesn't contain a recognizable line number
   ///
@@ -187,23 +190,30 @@ class BoardingDetector {
   /// method returns an empty string.
   Future<String> detectBusLineViaWiFi() async {
     try {
-      // Check if WiFi scanning is supported on this device
+      // Check support + permissions first. askPermissions: true triggers
+      // the runtime permission prompt (Android 6.0+) when needed.
       final canGetScannedResults =
-          await WiFiScan.instance.canGetScannedResults();
+          await WiFiScan.instance.canGetScannedResults(askPermissions: true);
       if (canGetScannedResults != CanGetScannedResults.yes) {
+        debugPrint('📶 WiFi scan unavailable: $canGetScannedResults');
         return '';
       }
 
-      // Request WiFi scan permission (required on Android API 23+)
-      final canStartScan = await WiFiScan.instance.canStartScan();
-      if (canStartScan == CanStartScan.yes) {
-        await WiFiScan.instance.startScan();
-        // Give the scan a moment to complete
-        await Future.delayed(const Duration(milliseconds: 500));
+      final canStartScan =
+          await WiFiScan.instance.canStartScan(askPermissions: true);
+      if (canStartScan != CanStartScan.yes) {
+        debugPrint('📶 Cannot start WiFi scan: $canStartScan');
+        return '';
       }
+
+      await WiFiScan.instance.startScan();
+      // Wait for the OS scan to complete. Scans are throttled to roughly
+      // one per 5 seconds on Android 8+, so give it ample time.
+      await Future.delayed(const Duration(seconds: 2));
 
       // Get scan results
       final results = await WiFiScan.instance.getScannedResults();
+      debugPrint('📶 WiFi scan returned ${results.length} networks');
 
       // Look for Cardiff Bus SSIDs and extract the line number
       for (final result in results) {

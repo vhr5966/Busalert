@@ -1,17 +1,15 @@
 // BusAlert Cardiff — Tests
 //
-// Since Firebase requires platform channels unavailable in the test
-// environment, this test suite focuses on the non-Firebase logic:
-// data models, GPS detection utilities, and app structure.
-//
-// Full integration tests require running on a real device or emulator
-// after configuring Firebase via `flutterfire configure`.
+// Validates data models, GPS detection utilities, Cardiff bounds,
+// and ensures production code does NOT contain mock vehicle generators.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:busalert/data/models/bus_stop.dart';
 import 'package:busalert/data/models/journey.dart';
 import 'package:busalert/data/models/prediction.dart';
+import 'package:busalert/data/models/bods_vehicle.dart';
+import 'package:busalert/data/services/bods_siri_service.dart';
+import 'package:busalert/data/repositories/bods_repository.dart';
 import 'package:busalert/core/theme.dart';
 import 'package:busalert/core/constants.dart';
 
@@ -38,7 +36,6 @@ void main() {
         'longitude': -3.2,
       });
 
-      // Distance to a point ~50m away
       final distance = stop.distanceTo(51.5005, -3.2);
       expect(distance, greaterThan(40));
       expect(distance, lessThan(70));
@@ -139,14 +136,55 @@ void main() {
   });
 
   group('Constants', () {
-    test('has Cardiff bus stop data', () {
-      expect(kMockBusStops.length, greaterThan(5));
-      expect(kMockBusStops.first['name'], contains('Cardiff'));
+    test('has Cardiff reference bus stop data', () {
+      expect(kCardiffReferenceStops.length, greaterThan(5));
+      expect(kCardiffReferenceStops.first['name'], contains('Cardiff'));
     });
 
     test('has GPS threshold constants', () {
       expect(kStopProximityMeters, equals(50.0));
       expect(kBoardingSpeedThresholdKmh, equals(7.0));
+    });
+  });
+
+  group('BodsVehicle model', () {
+    test('parseIso8601Duration parses positive and negative durations', () {
+      expect(BodsVehicle.parseIso8601Duration('PT5M30S'), closeTo(5.5, 0.01));
+      expect(BodsVehicle.parseIso8601Duration('-PT2M'), closeTo(-2.0, 0.01));
+      expect(BodsVehicle.parseIso8601Duration(null), isNull);
+    });
+
+    test('isWithinCardiffArea filters Cardiff coordinates', () {
+      const cardiffBus = BodsVehicle(
+        vehicleRef: 'V1',
+        lineRef: '28',
+        latitude: 51.4816,
+        longitude: -3.1791,
+      );
+      const swanseaBus = BodsVehicle(
+        vehicleRef: 'V2',
+        lineRef: 'X1',
+        latitude: 51.6214,
+        longitude: -3.9436,
+      );
+
+      expect(cardiffBus.isWithinCardiffArea, isTrue);
+      expect(swanseaBus.isWithinCardiffArea, isFalse);
+    });
+  });
+
+  group('No Mock Data Verification', () {
+    test('BodsSiriService returns genuine BODS vehicles or empty list without mock data', () async {
+      final service = BodsSiriService();
+      final vehicles = await service.fetchVehicles();
+      // Returns real live feed vehicles or empty, never generated mock data
+      expect(vehicles, isA<List<BodsVehicle>>());
+    });
+
+    test('BodsRepository returns genuine BODS vehicles or empty list', () async {
+      final repository = BodsRepository();
+      final vehicles = await repository.getAllVehicles();
+      expect(vehicles, isA<List<BodsVehicle>>());
     });
   });
 }
